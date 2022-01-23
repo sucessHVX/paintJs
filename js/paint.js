@@ -3,12 +3,19 @@ const ctx = canvas.getContext("2d"); //2d로 픽셀을 컨트롤하기위해 get
 const colors = document.getElementsByClassName("jsColor");
 const range = document.getElementById("jsRange");
 const mode = document.getElementById("jsMode");
+const save = document.getElementById("jsSave");
+const BASIC_COLOR = "#2c2c2c";
+const CANVAS_SIZE = 700;
 
-canvas.width = 700; //캔버스 width와 height를 줘야 실행됨
-canvas.height = 700;
+canvas.width = CANVAS_SIZE; //캔버스 width와 height를 줘야 실행됨
+canvas.height = CANVAS_SIZE;
 
-ctx.strokeStyle = "#2c2c2c"; //그릴 선들이 모두 이 색을 가짐
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+ctx.strokeStyle = BASIC_COLOR; //그릴 선들이 모두 이 색을 가짐
+ctx.fillStyle = BASIC_COLOR;
 ctx.lineWidth = 2.5; //선 굵기
+
 
 let painting = false;
 let filling = false;
@@ -40,6 +47,7 @@ function onMouseUp(event) {
 function handleColorClick(event) {
   const color = event.target.style.backgroundColor;
   ctx.strokeStyle = color;
+  ctx.fillStyle = color;
 }
 
 function handleRangeChange(event) {
@@ -57,22 +65,47 @@ function handleModeClick() {
   }
 }
 
+function handleCanvasClick() {
+  if (filling) {
+    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  }
+}
+
+function handleCM(event) {
+  event.preventDefault();
+}
+
+function handleSaveClick() {
+  const image = canvas.toDataURL("image/png");
+  const link = document.createElement("a");
+  link.href = image;
+  link.download = "그림";
+  link.click();    //이게 있어야 다운로드됨
+}
+
+//if로 변수 있는지 체크
 if (canvas) {
   canvas.addEventListener("mousemove", onMouseMove);
   canvas.addEventListener("mousedown", startPainting);
   canvas.addEventListener("mouseup", stopPainting);
   canvas.addEventListener("mouseleave", stopPainting);
+  canvas.addEventListener("click", handleCanvasClick);
+  canvas.addEventListener("contextmenu", handleCM);
+
 }
 
 Array.from(colors).forEach((color) =>
   color.addEventListener("click", handleColorClick)
 );
 
-//if로 체크
 if (range) {
   range.addEventListener("input", handleRangeChange);
 }
 
 if (mode) {
   mode.addEventListener("click", handleModeClick);
+}
+
+if (save) {
+  save.addEventListener("click", handleSaveClick);
 }
